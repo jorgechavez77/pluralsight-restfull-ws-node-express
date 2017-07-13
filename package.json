@@ -21,6 +21,7 @@
     "express": "^4.15.3",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
-    "mongoose": "^4.11.1"
+    "mongoose": "^4.11.1",
+    "promise": "^8.0.1"
   }
 }

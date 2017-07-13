@@ -1,5 +1,7 @@
 var express = require('express');
 var mongoose = require('mongoose');
+var promise = require('promise');
+mongoose.Promise = promise;
 
 var routes = (Book) => {
     var bookRouter = express.Router();
@@ -50,8 +52,31 @@ var routes = (Book) => {
             req.found.genre = req.body.genre;
             req.found.read = req.body.read;
 
-            req.found.save();
-            res.json(req.found);
+            req.found.save((err) => {
+                if (err) {
+                    res.status(500).send(err);
+                } else {
+                    res.json(req.found);
+                }
+            });
+        })
+        .patch((req, res) => {
+            if (req.found._id) {
+                delete req.body._id;
+            }
+
+            for (var prop in req.body) {
+                console.log('json property ' + prop);
+                req.found[prop] = req.body[prop];
+            }
+
+            req.found.save((err) => {
+                if (err) {
+                    res.status(500).send(err);
+                } else {
+                    res.json(req.found);
+                }
+            });
         });
 
     return bookRouter;
