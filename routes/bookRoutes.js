@@ -27,38 +27,31 @@ var routes = (Book) => {
             })
         });
 
+    bookRouter.use('/:id', (req, res, next) => {
+        Book.findById(req.params.id, (err, book) => {
+            if (err) {
+                res.status(500).send(err);
+            } else if (book) {
+                req.found = book;
+                next();
+            } else {
+                res.status(404).send('Book not found');
+            }
+        });        
+    });
+
     bookRouter.route('/:id')
         .get((req, res) => {
-            console.log(JSON.stringify(req.params));
-            var _id = req.params.id;
-
-            if (!mongoose.Types.ObjectId.isValid(_id)) {
-                var response = {message: 'Invalid param _id = ' + _id, error: '400' };
-                res.status(400).json(response);
-            }
-
-            Book.findById(_id, (err, book) => {
-                if (err) {
-                    res.status(500).send(err);
-                } else {
-                    res.json(book);
-                }
-            });
+            res.json(req.found);
         })
         .put((req, res) => {
-            Book.findById(req.params.id, (err, book) => {
-                if (err) {
-                    res.status(500).send(err);
-                } else {
-                    book.title = req.body.title;
-                    book.author = req.body.author;
-                    book.genre = req.body.genre;
-                    book.read = req.body.read;
+            req.found.title = req.body.title;
+            req.found.author = req.body.author;
+            req.found.genre = req.body.genre;
+            req.found.read = req.body.read;
 
-                    book.save();
-                    res.json(book);
-                }
-            });
+            req.found.save();
+            res.json(req.found);
         });
 
     return bookRouter;
