@@ -10,56 +10,15 @@ var db = mongoose.connect(mongoUri, {
 var Book = require('./model/bookModel.js');
 var app = express();
 var port = process.env.PORT || 3000;
-var bookRouter = express.Router();
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
 
-bookRouter.route('/books')
-    .post((req, res) => {
-        var book = new Book(req.body);
+bookRouter = require('./routes/bookRoutes')(Book);
 
-        book.save();
-        
-        res.status(201).send(book);
-    })
-    .get((req, res) => {
-        var query = req.query;
-        console.log('query: ' + JSON.stringify(query));
-
-        // Add a validator before going to the db
-
-        Book.find(query, (err, books) => {
-            if (err) {
-                res.status(500).send(err);
-            } else {
-                res.json(books);
-            }
-        })
-    });
-
-bookRouter.route('/books/:id')
-    .get((req, res) => {
-        console.log(JSON.stringify(req.params));
-        var _id = req.params.id;
-
-        if (!mongoose.Types.ObjectId.isValid(_id)) {
-            var response = {message: 'Invalid param _id = ' + _id, error: '400' };
-            res.status(400).json(response);
-        }
-
-        Book.findById(_id, (err, book) => {
-            if (err) {
-                res.status(500).send(err);
-            } else {
-                res.json(book);
-            }
-        })
-    });
-
-app.use('/api', bookRouter);
+app.use('/api/books', bookRouter);
 
 app.get('/', (req, res) => {
     res.send('Welcome to my API');
