@@ -43,7 +43,22 @@ var routes = (Book) => {
                 } else {
                     res.json(book);
                 }
-            })
+            });
+        })
+        .put((req, res) => {
+            Book.findById(req.params.id, (err, book) => {
+                if (err) {
+                    res.status(500).send(err);
+                } else {
+                    book.title = req.body.title;
+                    book.author = req.body.author;
+                    book.genre = req.body.genre;
+                    book.read = req.body.read;
+
+                    book.save();
+                    res.json(book);
+                }
+            });
         });
 
     return bookRouter;
