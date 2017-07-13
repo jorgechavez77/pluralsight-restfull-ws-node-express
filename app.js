@@ -16,7 +16,12 @@ var bookRouter = express.Router();
 
 bookRouter.route('/books')
     .get((req, res) => {
-        Book.find((err, books) => {
+        var query = req.query;
+        console.log('query: ' + JSON.stringify(query));
+
+        // Add a validator before going to the db
+
+        Book.find(query, (err, books) => {
             if (err) {
                 res.status(500).send(err);
             } else {
@@ -34,3 +39,6 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log('Gulp running on port ' + port);
 });
+
+// example
+// http://localhost:8000/api/books?genre=Historical%20Fiction&author=Lev%20Nikolavich%20Tolstoy
