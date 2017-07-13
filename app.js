@@ -1,5 +1,6 @@
 var express = require('express');
 var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
 
 var mongoUri = 'mongodb://admin:MtOL2SqA8qCmzNzx@cluster0-shard-00-00-kaayz.mongodb.net:27017,cluster0-shard-00-01-kaayz.mongodb.net:27017,cluster0-shard-00-02-kaayz.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 var db = mongoose.connect(mongoUri, {
@@ -7,14 +8,23 @@ var db = mongoose.connect(mongoUri, {
 });
 
 var Book = require('./model/bookModel.js');
-
 var app = express();
-
 var port = process.env.PORT || 3000;
-
 var bookRouter = express.Router();
 
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
+
 bookRouter.route('/books')
+    .post((req, res) => {
+        var book = new Book(req.body);
+
+        book.save();
+        
+        res.status(201).send(book);
+    })
     .get((req, res) => {
         var query = req.query;
         console.log('query: ' + JSON.stringify(query));
